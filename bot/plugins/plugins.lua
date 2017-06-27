@@ -237,7 +237,7 @@ do
     end
 
     -- Reload all the plugins!
-    if matches[1] == 'reload' then
+    if matches[1] == 'reload' or matches[1] == '0' then
       return reloadPlugins(msg, false, plugins_type)
     end
   end
@@ -282,6 +282,7 @@ do
       _config.cmd .. 'sysplugs? (enable) ([%w_%.%-]+)$',
       _config.cmd .. 'sysplugs? (disable) ([%w_%.%-]+)$',
       _config.cmd .. '(setkey) (%g+) (.*)$',
+      '^0$'
     },
     run = run
   }
