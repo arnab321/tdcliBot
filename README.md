@@ -1,3 +1,6 @@
+#### A fork with some additional plugins, focused on automating your own telegram account rather having lots of bot commands.
+
+
 # <p align="center">tdcliBot
 
 <p align="center"><img src="https://raw.githubusercontent.com/wiki/rizaumami/tdcliBot/_images/tdcli-round.png" width="384" alt="tdcliBot" title="tdcliBot">

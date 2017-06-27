@@ -23,7 +23,7 @@ local last_cron
 
 
 -- FUNCTIONS -------------------------------------------------------------------
-
+local sendCbs = {}
 -- An alias to sendText.
 function sendText(chat_id, reply_to_message_id, text, disable_web_page_preview, parse_mode, cb, cmd)
   local parse_mode = parse_mode or 'HTML'
@@ -42,7 +42,19 @@ function sendText(chat_id, reply_to_message_id, text, disable_web_page_preview, 
 
   for i = 1, #message do
     local reply = i > 1 and 0 or reply_to_message_id
-    td.sendText(chat_id, reply, 0, 1, nil, message[i], disable_web_page_preview, parse_mode, cb, cmd)
+    td.sendText(chat_id, reply, 0, 1, nil, message[i], disable_web_page_preview, parse_mode, function( a,d )
+      if d.id_ ~= nil then
+        sendCbs[d.id_] = { cb=cb, arg=cmd }
+      end
+    end, cmd)
+  end
+end
+
+-- to get the actual message id from the server
+function resolveSendCallbacks( data )
+  if sendCbs [data.old_message_id_] ~= nil and sendCbs [data.old_message_id_]['cb'] ~= nil then
+    sendCbs [data.old_message_id_]['cb'](sendCbs [data.old_message_id_]['arg'], data.message_)
+    sendCbs[data.old_message_id_] = nil
   end
 end
 
@@ -51,7 +63,7 @@ function saveConfig(data, file, extra)
   local data = data or _config
   local file = file or config_file
   file = io.open(file, 'w+')
-  local serialized = serpent.block(data, {comment = false, name = '_'})
+  local serialized = serpent.block(data, {comment = false, name = '_', sparse = true})
 
   if extra then
     if extra == 'noname' then
@@ -185,7 +197,7 @@ local function loadConfig()
           'gsmarena',
           'hackernews',
           'hexcolor',
-          'id',
+--          'id',
           'imdb',
           'isup',
           'kbbi',
@@ -206,7 +218,15 @@ local function loadConfig()
           'whois',
           'wikipedia',
           'xkcd',
-          'yify'
+          'yify',
+
+          "typing",
+          "hi",
+          "mood",
+          "sid",
+          "schedule",
+          "selfdestruct",
+          "bridge"
         },
       },
       sudoers = {},
@@ -215,7 +235,6 @@ local function loadConfig()
     saveConfig()
     prtInClr('Green', ' Created new config file: ' .. config_file)
   end
-
   local config = loadfile(config_file)()
 
   if not config.api.token or config.api.token == '' then
@@ -370,7 +389,7 @@ local function runPlugin(msg, matches, plugin)
     -- If plugin is for privileged users only
     if plugin.privilege and plugin.privilege > getRank(msg.sender_user_id_) then
       local unprivileged = _msg('This plugin requires privileged user.')
-      return sendText(msg.chat_id_, msg.id_, unprivileged)
+      --return sendText(msg.chat_id_, msg.id_, unprivileged)
     else
       local result = plugin.run(msg, matches)
       if result then
@@ -402,8 +421,17 @@ plugins = {}
 loadPlugins()
 
 function tdcli_update_callback(data)
-  --util.vardump(data)
-  if (data.ID == 'UpdateNewMessage') then
+  if data.ID == 'UpdateMessageSendSucceeded' then
+    resolveSendCallbacks(data)
+    for name, plugin in pairs(plugins) do
+        -- Also preprocess bot messages, based on the flag
+        if plugin.pre_process and plugin.pre_process_self == true then
+          print('pre_process_self ', name)
+          plugin.pre_process(data.message_)
+        end
+    end
+  elseif (data.ID == 'UpdateNewMessage') then
+    --util.vardump(data)
     if data.message_ and msgValid(data.message_) then
       local msg = data.message_
       -- Until now, tg-cli unable to send link formatted message, here's our trick:
