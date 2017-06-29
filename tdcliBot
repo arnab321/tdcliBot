@@ -201,6 +201,7 @@ case $1 in
     fi
     tdcli_config
     while true; do
+      git pull #useful with die.lua
       "$TDCLI_DIR"/telegram-cli -WRs ./bot/bot.lua -c "$TDCLI_DIR"/tdcli.cfg -p tdcliBot "$@"
       sleep 5
     done
