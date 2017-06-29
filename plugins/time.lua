@@ -46,6 +46,7 @@ do
 
     if area == nil then
       sendText(chat_id, msg.id_, _msg('<b>The time in nowhere is never</b>'))
+      return
     end
 
     local coordinats, code = util.getCoord(msg, area)
