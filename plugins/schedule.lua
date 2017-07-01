@@ -24,14 +24,12 @@ do
   local function delete_cron_by_chat(msg, data)
     local id = msg.chat_id_
     local n = 0
-    util.vardump(data)
     if data ~= nil and data.id_ ~= nil then
       id = data.id_
     end
 
     for k,v in pairs(cronned) do
       for kk,vv in pairs(v) do
-        print(vv[1], id)
         if vv[1] == id then
           v[kk]=nil
           n = n + 1
