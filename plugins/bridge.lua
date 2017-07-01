@@ -206,6 +206,9 @@ do
     elseif matches[1] == "del" then
       sendText(msg.chat_id_, msg.id_, _msg(delete(msg.chat_id_)))
     else
+      if matches[2] == nil then
+        matches[2] = "1"
+      end
       if string.sub(matches[1],1,1) == '@' then
         td.searchPublicChat(matches[1], callbackres, {msg, matches[2], matches[3]})
       else
@@ -226,6 +229,7 @@ do
        _config.cmd .. "bridge (@?-?.+) (1)$",
        _config.cmd .. "bridge (@?-?.+) ([0-1].[0-9]+) (.+)$",
        _config.cmd .. "bridge (@?-?.+) (1) (.+)$",
+       _config.cmd .. "bridge (@?-?.+)$",
        _config.cmd .. "bridge (list)$",
        _config.cmd .. "bridge (del)$"
        

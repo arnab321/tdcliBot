@@ -15,10 +15,34 @@ do
   local function delete_cron(date)
     for k,v in pairs(cronned) do
       if k == date then
-  	  cronned[k]=nil
+  	    cronned[k]=nil
       end
     end
     saveConfig(cronned, filename)
+  end
+
+  local function delete_cron_by_chat(msg, data)
+    local id = msg.chat_id_
+    local n = 0
+    util.vardump(data)
+    if data ~= nil and data.id_ ~= nil then
+      id = data.id_
+    end
+
+    for k,v in pairs(cronned) do
+      for kk,vv in pairs(v) do
+        print(vv[1], id)
+        if vv[1] == id then
+          v[kk]=nil
+          n = n + 1
+        end
+      end
+      if #v == 0 then
+        cronned[k] = nil
+      end
+    end
+    saveConfig(cronned, filename)
+    sendText(msg.chat_id_, msg.id_, n .. " future hopes were lost.")
   end
 
   local function split(str, sep)
@@ -66,6 +90,17 @@ do
     local delays = {}
     local intMin, intMax, times
 
+    if matches[1] == "del" then
+      if matches[2] ~= nil  and string.sub(matches[2],1,1)=='@' then
+        td.searchPublicChat(matches[2], delete_cron_by_chat, msg)
+      elseif matches[2] ~= nil then
+        delete_cron_by_chat(msg, {id_ = matches[2]})
+      else
+        delete_cron_by_chat(msg)
+      end
+      return
+    end
+
     for i = 2, #matches-1 do
       local b,_ = string.gsub(matches[i],"[a-zA-Z]","")
       if string.find(matches[i], "-") then
@@ -99,8 +134,9 @@ do
       delays[1] = delay
     else
       math.randomseed( datetime.sec )
-      for i=1,times do
-        delays[#delays+1] = os.time() + math.random(intMin, intMax)*60
+      delays[1] = os.time() + math.random(intMin, intMax)*60
+      for i=2,times do
+        delays[#delays+1] = delays[#delays] + math.random(intMin, intMax+1)*60
       end
     end
     if string.sub(matches[1],1,1)=='@' then
@@ -128,7 +164,10 @@ do
 
       _config.cmd .. "sch( )([0-9]+:[0-9]+) (.+)$",
       _config.cmd .. "sch( )([0-9]+:[0-9]+[:][0-9]+) (.+)$",
-      _config.cmd .. "sch( )([0-9]+-[0-9]+) ([x][0-9]+) (.+)$"
+      _config.cmd .. "sch( )([0-9]+-[0-9]+) ([x][0-9]+) (.+)$",
+
+      _config.cmd .. "sch (del)$",
+      _config.cmd .. "sch (del) (@?-?.+)$"
     }, 
     run = run,
     cron = cron,
