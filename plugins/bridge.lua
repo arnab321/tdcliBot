@@ -100,9 +100,9 @@ do
     titles.n = titles.n - 1
     if d.title_ ~= nil then
       titles[tonumber(d.id_)] = d.title_
-      if titles.n == 0 then
+    end
+    if titles.n == 0 then
         sendDetails(titles.msg, titles)
-      end
     end
   end
 
@@ -225,14 +225,13 @@ do
       },
     },
     patterns = {
+       _config.cmd .. "bridge (list)$",
+       _config.cmd .. "bridge (del)$",
        _config.cmd .. "bridge (@?-?.+) ([0-1].[0-9]+)$",
        _config.cmd .. "bridge (@?-?.+) (1)$",
        _config.cmd .. "bridge (@?-?.+) ([0-1].[0-9]+) (.+)$",
        _config.cmd .. "bridge (@?-?.+) (1) (.+)$",
-       _config.cmd .. "bridge (@?-?.+)$",
-       _config.cmd .. "bridge (list)$",
-       _config.cmd .. "bridge (del)$"
-       
+       _config.cmd .. "bridge (@?-?.+)$"
     }, 
     run = run,
     pre_process = pre_process,

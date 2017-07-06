@@ -52,8 +52,9 @@ do
 
 	local function pre_process( msg )
 		chat_id = tonumber(msg.chat_id_)
-		if msg ~= nil and chats[chat_id] ~= nil then
-			print(chats[chat_id])
+		if msg ~= nil and chats[chat_id] ~= nil and 
+			tonumber(msg.sender_user_id_) == _config.bot.id then
+			print("selfDestruct in " .. chats[chat_id] .. "s")
 			td.setAlarm(chats[chat_id], deleteMsg, msg)
 		end
 		return msg

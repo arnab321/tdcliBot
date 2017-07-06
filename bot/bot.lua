@@ -486,6 +486,7 @@ function tdcli_update_callback(data)
                   plugin = plugin
               })
             end
+            break
           end
         end
       end
