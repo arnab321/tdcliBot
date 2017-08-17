@@ -4,7 +4,7 @@ do
     local text =  '<code>' .. (resolvedId or chat_id) .. '</code>'
     sendText(chat_id, msg_id, text, 1, nil, function (arg,data)
       td.setAlarm(5, function( a,d )
-        td.deleteMessages(chat_id, {[0] = msg_id, data.id_})
+        td.deleteMessages(chat_id, {[0] = data.id_, msg_id})
       end)
     end)
   end
