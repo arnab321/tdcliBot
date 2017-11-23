@@ -87,8 +87,8 @@ install_rocks() {
 # install tdcliBot
 install() {
   prtgrn 'Do you want me to install tdcliBot? (Yy/Nn): '
-  read -rp ' ' install
-
+  # read -rp ' ' install
+  install='y' #prepare for docker
   case "$install" in
     Y|y)
       prtgrn '>> Create tg folder'
@@ -96,8 +96,11 @@ install() {
 
       if [ -x "$(which apt-get)" ]; then
         prtgrn '>> Updating packages'
-        sudo apt-get update --yes && sudo apt-get upgrade
-
+        apt-get update --yes && apt-get upgrade --yes
+        if [ ! -x "$(which sudo)" ]; then
+          echo "sudo not found" #docker stuff
+          apt-get --yes install sudo
+        fi
         prtgrn '>> Installing dependencies'
         sudo apt-get --yes install wget libconfig9 libjansson4 lua5.2 liblua5.2 make unzip git redis-server g++ whois fortune fortunes
       else

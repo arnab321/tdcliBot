@@ -287,8 +287,8 @@ local function msgValid(msg, block_self)
       --return false
    --end
   -- Before bot was started
-  if msg.date_ < now then
-    prtInClr('Red', 'Not valid: old msg')
+  if now - msg.date_ > 3600 then
+    prtInClr('Red', 'Not valid: old msg (> 1hr)')
     return false
   end
   if not msg.chat_id_ then
